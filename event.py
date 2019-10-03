@@ -10,8 +10,8 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 app = Flask(__name__)
 
-slack_event_listen = SlackEventAdapter(signing_secret='03daaddc7a79ed4326ddfec570d29bf8', endpoint="/slack/events", server=app)
-token = 'xoxb-779874283382-779940814246-yydZ80ZBMny8reRy1Un2V7WX'
+slack_event_listen = SlackEventAdapter(signing_secret='512dccab767437d52268bef8f4c4160e', endpoint="/slack/events", server=app)
+token = 'xoxb-779874283382-781917834228-yOwDUWiwPuVU7lTt4cvCeRzn'
 client = WebClient(token=token)
 
 ch = ["DNXTNQ23Y","CNP70R1SM"]
