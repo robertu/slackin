@@ -4,8 +4,10 @@ import slack
 from slack import WebClient
 from slackeventsapi import SlackEventAdapter
 from flask import Flask, request, make_response, Response
-import json
+import json, re
+import pprint
 
+pp = pprint.PrettyPrinter(indent=4)
 app = Flask(__name__)
 
 event_listen = SlackEventAdapter(signing_secret='03daaddc7a79ed4326ddfec570d29bf8', endpoint="/slack/events", server=app)
@@ -24,24 +26,32 @@ def message(event_data):
     except KeyError:
         pass
     print(event_data)
+    cmd = re.split(r'\W+',event_data["event"]["text"])
+    print(cmd)
 
-    if ch in event_data["event"]["channel"] and "witaj" in event_data["event"]["text"]:
+    if ch in event_data["event"]["channel"] and cmd[0] == "form":
         mess = client.chat_postMessage(
             channel= event_data["event"]["channel"],
             text="witaj",
             attachments=[
-            {
+            {   
                 "text": "Formularze",
                 "fallback": "Nie możesz wybrać formularza",
-                "callback_id": "fromSelect",
+                "callback_id": f"fromSelect:{cmd}",
                 "color": "#3AA3E3",
                 "attachment_type": "default",
                 "actions": [
                     {
-                        "name": "Formularz 1",
-                        "text": "Formularz 1",
+                        "name": "cmd",
+                        "text": "cmd",
+                        "type": "hidden",
+                        "value": str(cmd)
+                    },
+                    {
+                        "name": "bt1",
+                        "text": f"Otwórz formularz {cmd[1:]}",
                         "type": "button",
-                        "value": "form1"
+                        "value": "form1-button"
                     }
                 ],
             }
@@ -54,25 +64,86 @@ def message(event_data):
 @app.route("/slack/message_actions", methods=["POST"])
 def message_actions():
     data = json.loads(request.form["payload"])
+    pp.pprint(vars(request))
     rt = data['type']
     if rt == "dialog_submission":
         print(data['submission'])
+
     elif rt == "interactive_message":
-        form1 = client.dialog_open(
-            trigger_id= data["trigger_id"],
-            dialog= {
-                "title": "Formularz 1",
-                "submit_label": "Wyślij",
-                "callback_id": "formCallback",
-                "elements": [
+        om = data['original_message']
+        at = om['attachments']
+        ci = at[0]['callback_id']
+        cmd = []
+        if ci.startswith("fromSelect:"):
+            cmd = ci.replace("fromSelect:",'')
+            cmd = eval(cmd)
+        print(at)
+        n = 1
+        elements = []
+        for e in cmd:
+            if e == 'form':
+                pass
+            elif e == 'dd':
+                elements.append(
+                    {
+                        "label": "Imię zwierzątka",
+                        "name": f"el_{e}_{n}",
+                        "type": "select",
+                        "value": "2",
+                        "placeholder": "Wybierz imię",
+                        "options": [
+                            {
+                                "label": "Ala",
+                                "value": "1"
+                            },
+                            {
+                                "label": "Ola",
+                                "value": "2"
+                            }
+
+                        ]
+                    }
+                )
+
+            elif e == 'text':
+                elements.append(
                     {
                     "label": "Input text",
-                    "name": "text",
+                    "name": f"el_{e}_{n}",
                     "type": "text",
                     "placeholder": "Wpisz cokolwiek"
                     }
-                ]
-            }
+                )
+            elif e == 'area':
+                elements.append(
+                    {
+                    "label": "Input textarea",
+                    "name": f"el_{e}_{n}",
+                    "type": "textarea",
+                    "placeholder": "Wpisz cokolwiek"
+                    }
+                )
+            else:
+                elements.append(
+                    {
+                    "label": "Input text",
+                    "name": f"el_{e}_{n}",
+                    "type": "text",
+                    "placeholder": "Wpisz cokolwiek"
+                    }
+                )
+            n += 1
+
+        dialog = {
+                "title": "Formularz",
+                "submit_label": "Wyślij",
+                "callback_id": "formCallback",
+                "elements": elements
+        }
+        pp.pprint(dialog)
+        form1 = client.dialog_open(
+            trigger_id = data["trigger_id"],
+            dialog = dialog
         )
     else:
         print(f"nieznany typ messaga {rt}")
