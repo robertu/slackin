@@ -81,7 +81,7 @@ Następnie uruchamiamy kod bota "python event.py" albo "./event.py"
 
 Następnie w zakładce Event Subscriptions włączamy eventy i podajemy następujący adess "https://<Nasz domena>/slack/events
 
-![12. event](12-event-url)
+![12. event](12-event-url.png)
 
-Dodatkowo można nadać mu uprawnienia admina, poniżej załączam ofcjialną dokumnetacja aplikacji na slacku
-[sack tut](https://github.com/slackapi/python-slackclient/tree/master/tutorial)
+Dodatkowo można nadać mu uprawnienia admina, poniżej załączam ofcjialną dokumnetacja aplikacji na slacku:
+[sack bot tut](https://github.com/slackapi/python-slackclient/tree/master/tutorial)
