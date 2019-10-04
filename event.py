@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 import os
 import slack
+import cairo
+from io import BytesIO
 from slack import WebClient
 from slackeventsapi import SlackEventAdapter
 from flask import Flask, request, make_response, Response
 import json, re
 import pprint
+from PIL import Image, ImageDraw, ImageFont
+import random, wget
 
 pp = pprint.PrettyPrinter(indent=4)
 app = Flask(__name__)
@@ -14,24 +18,44 @@ slack_event_listen = SlackEventAdapter(signing_secret='512dccab767437d52268bef8f
 token = 'xoxb-779874283382-781917834228-yOwDUWiwPuVU7lTt4cvCeRzn'
 client = WebClient(token=token)
 
-ch = ["DNXTNQ23Y","CNP70R1SM"]
+ch = ["DP2HBSGDU","CNP70R1SM"]
 
 #Nsłuchuje na kanale bota wiadomości
 @slack_event_listen.on("message")
 def message(event_data):
     print(event_data)
+    if event_data["event"]["text"] == 'obrazek':
+        wget.download('https://8ce222c8.ngrok.io/obrazek.png')
+        mess = client.chat_postMessage(
+            channel = event_data["event"]["channel"],
+            text = 'Work',
+            attachments=[
+                {
+                "title": "Wykres",
+                "image_url": "https://8ce222c8.ngrok.io/obrazek.png"
+                }
+            ]
+            
+        )
+        return
+
     # try:
     #     username = event_data["event"]['username']
     #     if username == 'TestBot':
     #         return make_response("", 200)
     # except KeyError:
     #     pass
-    cmd = re.split(r'\W+',event_data["event"]["text"])
+    try:
+        cmd = re.split(r'\W+',event_data["event"]["text"])
+    except KeyError:
+        return
+    channel = event_data["event"]["channel"]
+    print("Channel:", channel)
     print(cmd)
 
-    if event_data["event"]["channel"] in ch and cmd[0] == "form":
+    if cmd[0] == "form":
         mess = client.chat_postMessage(
-            channel= event_data["event"]["channel"],
+            channel = channel,
             text="witaj",
             attachments=[
                 {   
@@ -71,14 +95,118 @@ def slack_wiki():
     )
     return make_response("ok", 200)
 
+
+
+def losuj_imie():
+    imiona = [
+        'Jan',
+        'Anita',
+        'Marek',
+        'Ola',
+        "Andrzej"
+
+    ]
+    return imiona[random.randint(0,len(imiona)-1)]
+
+def losuj_nazwisko():
+    nazwiska =[
+        'Kowalski',
+        'Skrzyniarski',
+        "Adwokat",
+        "Kowalczyk",
+        'Literacki'
+    ]
+    return nazwiska[random.randint(0,len(nazwiska)-1)]
+
+maxzad = 30
+user_count = 0
+def get_users():
+    import random
+    users = []
+    for u in range(random.randint(5,10)):
+        users.append(
+            {
+                'imie': losuj_imie(),
+                'nazwisko': losuj_nazwisko(),
+                'zadania': random.randint(1,maxzad)
+            }
+        )
+        user_count=+1
+    print("wyg tyle:", len(users))
+    return users
+
+size = 0
+wys = 30
+odstep = 10
+margines=25
+def drawSomethingCool(ctx, users):
+    y = margines
+    x = 300
+    rect = (600 - x - margines)/maxzad
+    max = 0
+    for u in users:
+        n = f"{u['imie']} {u['nazwisko']}"
+        if max < len(n):
+            max = len(n)
+    x = max * wys*0.3 + margines * 2
+    for u in users:
+        print(x,y,u)
+        zad = u['zadania']
+        ctx.rectangle(x, y, zad*rect, wys)
+
+        if zad > maxzad/2:
+            ctx.set_source_rgb(1, 0, 0)
+        else:
+            ctx.set_source_rgb(0, 0.3, 0)
+        ctx.set_font_size(wys*0.5)
+        ctx.move_to(margines, y+wys*0.75)
+        ctx.show_text(f"{u['imie']} {u['nazwisko']}")
+        ctx.fill()
+        #x =+ 100
+        y += odstep+wys
+        
+    
+
+
+#Nałuchiwanie na odpowiedz z wiadomości z przyciskiem
+@app.route("/obrazek.png", methods=["GET"])
+def obrazek_png():
+    users = get_users()
+    srf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 600, len(users)*wys+(len(users)-1)*odstep+2*margines)
+    ctx = cairo.Context(srf)
+    drawSomethingCool(ctx, users)
+    flo = BytesIO()
+    srf.write_to_png(flo)
+    resp = make_response(flo.getvalue())
+    resp.content_type = "image/png"
+    return resp
+
+def obrazek():
+    png = Image.new('RGBA', (512,512), (255,255,255,0))
+    d = ImageDraw.Draw(png)
+    d.text((10,10), "Hello",fill=(255,255,255,128))
+    png.save('zdj.png')
+    # mess = client.files_upload(
+    #     channel= 'CNP70R1SM',
+    #     content="zdj.png",
+    #     filetype='png'
+    # )
+    return make_response("",  200)
+
+
 #Nałuchiwanie na odpowiedz z wiadomości z przyciskiem
 @app.route("/slack/message_actions", methods=["POST"])
 def message_actions():
+    
     data = json.loads(request.form["payload"])
     pp.pprint(vars(request))
     rt = data['type']
     if rt == "dialog_submission":
         print(data['submission'])
+        mess = client.chat_postMessage(
+            channel=data["channel"]["id"],
+            text=f"Dziękujemy za formularz: {data['submission']}"
+        )
 
     elif rt == "interactive_message":
         om = data['original_message']
@@ -209,48 +337,48 @@ def message_actions():
 
 
 #Komendy
-@app.route('/form1', methods=['POST'])
-def formularz1():
-    payload = request.form["trigger_id"]
-    fromularzCall = client.dialog_open(
-        trigger_id= payload ,
-        dialog= {
-            "title": "Formularz 1",
-            "submit_label": "Wyślij",
-            "callback_id": "formCallback",
-            "elements": [
-                {
-                "label": "Input text",
-                "name": "text",
-                "type": "text",
-                "placeholder": "Wpisz cokolwiek"
-                }
-            ]
-        }
-    )
-    return make_response("", 200)
+# @app.route('/form1', methods=['POST'])
+# def formularz1():
+#     payload = request.form["trigger_id"]
+#     fromularzCall = client.dialog_open(
+#         trigger_id= payload ,
+#         dialog= {
+#             "title": "Formularz 1",
+#             "submit_label": "Wyślij",
+#             "callback_id": "formCallback",
+#             "elements": [
+#                 {
+#                 "label": "Input text",
+#                 "name": "text",
+#                 "type": "text",
+#                 "placeholder": "Wpisz cokolwiek"
+#                 }
+#             ]
+#         }
+#     )
+#     return make_response("", 200)
 
     
-@app.route('/form2', methods=['POST'])
-def formularz2():
-    payload = request.form["trigger_id"]
-    fromularzCall = client.dialog_open(
-        trigger_id= payload ,
-        dialog= {
-            "title": "Formularz 2",
-            "submit_label": "Wyślij",
-            "callback_id": "formCallback",
-            "elements": [
-                {
-                "label": "Input text",
-                "name": "text",
-                "type": "text",
-                "placeholder": "Wpisz cokolwiek"
-                }
-            ]
-        }
-    )
-    return make_response("", 200)
+# @app.route('/form2', methods=['POST'])
+# def formularz2():
+#     payload = request.form["trigger_id"]
+#     fromularzCall = client.dialog_open(
+#         trigger_id= payload ,
+#         dialog= {
+#             "title": "Formularz 2",
+#             "submit_label": "Wyślij",
+#             "callback_id": "formCallback",
+#             "elements": [
+#                 {
+#                 "label": "Input text",
+#                 "name": "text",
+#                 "type": "text",
+#                 "placeholder": "Wpisz cokolwiek"
+#                 }
+#             ]
+#         }
+#     )
+#     return make_response("", 200)
 
 
 

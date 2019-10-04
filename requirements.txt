@@ -1,0 +1,5 @@
+flask
+cairosvg
+pycairo
+slackeventsapi
+slackclient
