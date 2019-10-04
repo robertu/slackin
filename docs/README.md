@@ -30,7 +30,7 @@ I zapisujemy zmiany
 
 ### Uprawnienia bota
 
-W tym momencie w zakładce OAuth w sekcji scopes nadajemy mu perrmise 'admin' i klikamy "save changes"
+W tym momencie w zakładce OAuth w sekcji "scopes" nadajemy mu permise 'admin' i klikamy "save changes"
 
 ![06. add admin](06-admin-add.png)
 
@@ -52,11 +52,7 @@ Następnie w "Manage Distribution" zaznaczamy "I’ve reviewed and removed any h
 ![09. publish bot](09-publish-bot.png)
 
 
-Teraz jeszcze raz dodajemy bnot usera a nstępnie w kodzie podmieniamy następujące linijki:
-
-```
-???
-```
+Teraz zmieniamy:
 
 ### Token
 
@@ -79,7 +75,7 @@ Teraz muszimy przypisać w kodzie te dwie wartości
 
 Następnie uruchamiamy kod bota "python event.py" albo "./event.py"
 
-Następnie w zakładce Event Subscriptions włączamy eventy i podajemy następujący adess "https://<Nasz domena>/slack/events
+Następnie w zakładce 'Event Subscriptions' włączamy eventy i podajemy następujący ades "https://<Nasz domena>/slack/events
 
 ![12. event](12-event-url.png)
 
