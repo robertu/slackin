@@ -79,5 +79,5 @@ Następnie w zakładce 'Event Subscriptions' włączamy eventy i podajemy nastę
 
 ![12. event](12-event-url.png)
 
-Dodatkowo można nadać mu uprawnienia admina, poniżej załączam ofcjialną dokumnetacja aplikacji na slacku:
+Dodatkowo należy nadać mu uprawnienia admina oraz message.channels , poniżej załączam ofcjialną dokumnetacja aplikacji na slacku:
 [sack bot tut](https://github.com/slackapi/python-slackclient/tree/master/tutorial)
