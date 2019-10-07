@@ -19,20 +19,21 @@ token = 'xoxb-779874283382-781917834228-yOwDUWiwPuVU7lTt4cvCeRzn'
 client = WebClient(token=token)
 
 ch = ["DP2HBSGDU","CNP70R1SM"]
+dm = {}
 
 #Nsłuchuje na kanale bota wiadomości
 @slack_event_listen.on("message")
 def message(event_data):
     print(event_data)
     if event_data["event"]["text"] == 'obrazek':
-        wget.download('https://8ce222c8.ngrok.io/obrazek.png')
+        wget.download('https://0f86c6e7.ngrok.io/obrazek.png')
         mess = client.chat_postMessage(
             channel = event_data["event"]["channel"],
             text = 'Work',
             attachments=[
                 {
                 "title": "Wykres",
-                "image_url": "https://8ce222c8.ngrok.io/obrazek.png"
+                "image_url": "https://0f86c6e7.ngrok.io/brazek.png"
                 }
             ]
             
@@ -52,6 +53,36 @@ def message(event_data):
     channel = event_data["event"]["channel"]
     print("Channel:", channel)
     print(cmd)
+
+    if cmd[0] == "start":
+        #dm[cmd[1]] = event_data["event"]["channel"]
+        mess = client.chat_postMessage(
+            channel=event_data["event"]["channel"],
+            text='',
+            attachments=[
+                {
+                    'text': 'Zezwól na komunikację z botem',
+                    "fallback": "",
+                    "callback_id": "start",
+                    "color": "#3AA3E3",
+                    "attachment_type": "default",
+                    "actions": [
+                        {   
+                        "name": "start",
+                        "text": "Zacznij",
+                        "type": "button",
+                        "value": "ready"
+                        },
+                    ]                
+
+                }
+
+            ]
+
+        )
+
+        
+        
 
     if cmd[0] == "form":
         mess = client.chat_postMessage(
@@ -84,6 +115,32 @@ def message(event_data):
     return make_response("", 200)
 
 my_channel = 'CNXL9RRCP'
+
+
+@app.route("/api/messages", methods=['GET','POST'])
+def cmd_slack():        
+    if request.method == 'POST':
+        message_text = request.form["text"]
+        channel = request.form["ch"]
+        print(channel)
+        print (dm)
+
+        try:
+            channel_id = dm[channel]
+            print("work")
+            mess_pv = client.chat_postMessage(
+                channel=channel_id,
+                text = message_text
+            )
+        except KeyError:
+            mess = client.chat_postMessage(
+                channel=channel,
+                text=message_text,
+            )
+        except IndexError:
+            return make_response(f"Nie znam tego: {channel}", 400)
+
+    return make_response(f"{message_text}", 200)
 
 #Nałuchiwanie na odpowiedz z wiadomości z przyciskiem
 @app.route("/slack/wiki", methods=["GET"])
@@ -207,6 +264,9 @@ def message_actions():
             channel=data["channel"]["id"],
             text=f"Dziękujemy za formularz: {data['submission']}"
         )
+    elif rt == "interactive_message" and data['callback_id'] == "start":
+        dm[data['user']['name']] = data["channel"]["id"]
+        print("Work")
 
     elif rt == "interactive_message":
         om = data['original_message']
