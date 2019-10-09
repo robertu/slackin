@@ -21,7 +21,9 @@ DEFAULT_PORT = 4000
 secret = None
 slack_event_listen = None
 token = None
+host = None
 url = None
+nazwa_bota = None
 
 client = None
 dm = {}
@@ -170,11 +172,23 @@ if __name__ == '__main__':
     except KeyError:
         print("Brak debug_mode konfiguracji")
         sys.exit(1)
+
+    try:
+        nazwa_bota = config['BOT']['name']
+    except KeyError:
+        print("Brak name konfiguracji")
+        sys.exit(1) 
     
     try:
         url = config['BOT']['url']
     except KeyError:
         print("Brak url konfiguracji")
+        sys.exit(1)
+
+    try:
+        host = config['BOT']['host']
+    except KeyError:
+        print("Brak hosta konfiguracji")
         sys.exit(1)
 
     if sys.argv[1] == None:
@@ -204,27 +218,6 @@ if __name__ == '__main__':
     @slack_event_listen.on("message")
     def message(event_data):
         print(event_data)
-        if event_data["event"]["text"] == 'obrazek':
-            # wget.download('https://0d68839c.ngrok.io/wykres.png')
-            # mess = client.chat_postMessage(
-            #     channel = event_data["event"]["channel"],
-            #     text = 'Work',
-            #     attachments=[
-            #         {
-            #         "title": "Wykres",
-            #         "image_url": "https://0d68839c.ngrok.io/obrazek.png"
-            #         }
-            #     ]
-                
-            # )
-            upload = client.files_upload(
-                channels= event_data["event"]["channel"],
-                file= "pdftest.pdf",
-                title= 'Wykres',
-                initial_comment= "Test"
-            )
-            print (upload)
-            return
 
         # try:
         #     username = event_data["event"]['username']
@@ -239,8 +232,19 @@ if __name__ == '__main__':
         channel = event_data["event"]["channel"]
         print("Channel:", channel)
         print(cmd)
+        try:
+            nazwa = cmd[0]
+            komenda = cmd[1]
+            try:
+                args = cmd[2:]
+            except IndexError:
+                args = []
+        except IndexError:
+            return make_response("", 200)
+        if not (nazwa in [nazwa_bota, 'all']):
+            return make_response("", 200)
 
-        if cmd[0] == "start":
+        if komenda == "start":
             #dm[cmd[1]] = event_data["event"]["channel"]
             mess = client.chat_postMessage(
                 channel=event_data["event"]["channel"],
@@ -260,17 +264,21 @@ if __name__ == '__main__':
                             "value": "ready"
                             },
                         ]                
-
                     }
-
                 ]
-
             )
+            return make_response("", 200)
 
-            
-            
+        if komenda == "obrazek":
+            upload = client.files_upload(
+                channels= event_data["event"]["channel"],
+                file= "pdftest.pdf",
+                title= 'Wykres',
+                initial_comment= "Test"
+            )
+            return make_response("", 200)
 
-        if cmd[0] == "form":
+        if komenda == "form":
             mess = client.chat_postMessage(
                 channel = channel,
                 text="witaj",
@@ -290,7 +298,7 @@ if __name__ == '__main__':
                             },
                             {
                                 "name": "bt1",
-                                "text": f"Otwórz formularz {cmd[1:]}",
+                                "text": f"Otwórz formularz {args}",
                                 "type": "button",
                                 "value": "form1-button"
                             }
@@ -298,6 +306,12 @@ if __name__ == '__main__':
                     }
                 ]
             )
+            return make_response("", 200)
+    
+        mess = client.chat_postMessage(
+            channel = channel,
+            text=f"Nieznana komenda `{komenda}`",
+        )
         return make_response("", 200)
 
 
@@ -510,5 +524,6 @@ if __name__ == '__main__':
         return make_response("", 200)
 
 
+    print(f'\33]0;bot: {nazwa_bota}\a', end='', flush=True)
 
     app.run(port=port, debug=debug, host='0.0.0.0')
