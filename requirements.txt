@@ -3,3 +3,4 @@ cairosvg
 pycairo
 slackeventsapi
 slackclient
+wget
