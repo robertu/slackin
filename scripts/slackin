@@ -10,6 +10,7 @@ import json, re
 import pprint
 from PIL import Image, ImageDraw, ImageFont
 import random, wget, configparser
+from slackin.gens import losuj_imie, losuj_nazwisko, get_users
 
 pp = pprint.PrettyPrinter(indent=4)
 app = None
@@ -30,44 +31,6 @@ dm = {}
 
 my_channel = 'CNXL9RRCP'
 
-
-
-def losuj_imie():
-    imiona = [
-        'Jan',
-        'Anita',
-        'Marek',
-        'Ola',
-        "Andrzej"
-
-    ]
-    return imiona[random.randint(0,len(imiona)-1)]
-
-def losuj_nazwisko():
-    nazwiska =[
-        'Kowalski',
-        'Skrzyniarski',
-        "Adwokat",
-        "Kowalczyk",
-        'Literacki'
-    ]
-    return nazwiska[random.randint(0,len(nazwiska)-1)]
-
-maxzad = 30
-user_count = 0
-def get_users():
-    users = []
-    for u in range(random.randint(5,10)):
-        users.append(
-            {
-                'imie': losuj_imie(),
-                'nazwisko': losuj_nazwisko(),
-                'zadania': random.randint(1,maxzad)
-            }
-        )
-        user_count=+1
-    print("wyg tyle:", len(users))
-    return users
 
 size = 0
 wys = 30
@@ -357,7 +320,7 @@ if __name__ == '__main__':
     #Nałuchiwanie na odpowiedz z wiadomości z przyciskiem
     @app.route("/obrazek.png", methods=["GET"])
     def obrazek_png():
-        users = get_users()
+        users = get_users(30)
         srf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 600, len(users)*wys+(len(users)-1)*odstep+2*margines)
         ctx = cairo.Context(srf)
         drawSomethingCool(ctx, users)
