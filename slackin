@@ -473,15 +473,15 @@ if __name__ == '__main__':
                         "placeholder": "Wpisz cokolwiek"
                         }
                     )
-                else:
-                    elements.append(
-                        {
-                        "label": "Input text",
-                        "name": f"el_{e}_{n}",
-                        "type": "text",
-                        "placeholder": "Wpisz cokolwiek"
-                        }
-                    )
+                # else:
+                #     elements.append(
+                #         {
+                #         "label": "Input text",
+                #         "name": f"el_{e}_{n}",
+                #         "type": "text",
+                #         "placeholder": "Wpisz cokolwiek"
+                #         }
+                #     )
                 n += 1
 
             dialog = {
