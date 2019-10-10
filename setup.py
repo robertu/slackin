@@ -8,8 +8,10 @@ setuptools.setup(
     version="0.0.1",
     author="Mateusz Olkesa",
     description="Kod bota",
+    scripts=['scripts/slackin', 'scripts/slackinctl'],
+    packages=['slackin'],
+    package_dir={'slackin': 'src/slackin'},
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=setuptools.find_packages(),
     python_requires='>=3.6',
 )

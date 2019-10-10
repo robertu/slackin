@@ -10,12 +10,13 @@ import json, re
 import pprint
 from PIL import Image, ImageDraw, ImageFont
 import random, wget, configparser
+import argparse
 from slackin.gens import losuj_imie, losuj_nazwisko, get_users
+
 
 pp = pprint.PrettyPrinter(indent=4)
 app = None
-config = configparser.ConfigParser()
-config.read(sys.argv[1])
+
 
 port = None
 DEFAULT_PORT = 4000
@@ -111,6 +112,23 @@ def drawSomethingCool(ctx, users):
 
 
 if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-h','--help' help='Show help')
+    parser.add_argument('-c','--config'help='add config')
+
+    try: 
+        exist = os.path.isfile(sys.argv[2])
+    except IndexError:
+        print('Podany plik konfiguracyjny nie istnieje!')
+        sys.exit(1)
+    
+    if not exist:
+        print('Podany plik konfiguracyjny nie istnieje!')
+        sys.exit(1)
+    
+    config = configparser.ConfigParser()
+    config.read(sys.argv[2])
 
     try:
         port = config['BOT']['port']
