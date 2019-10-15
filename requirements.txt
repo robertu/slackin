@@ -3,11 +3,5 @@ cairosvg
 pycairo
 slackeventsapi
 slackclient
-wget
-random
-io
-json
-re
-pprint
-PIL
+pillow
 argparse

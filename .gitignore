@@ -1,4 +1,5 @@
 /dist
+.env.local
 /*egg-info
 *.pdf
 *.png
