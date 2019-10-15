@@ -9,7 +9,7 @@ from flask import Flask, request, make_response, Response
 import json, re
 import pprint
 from PIL import Image, ImageDraw, ImageFont
-import random, wget, configparser
+import random, configparser
 import argparse
 from slackin.gens import losuj_imie, losuj_nazwisko, get_users
 
