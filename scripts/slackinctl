@@ -5,20 +5,58 @@ import requests
 import json
 import time
 import configparser
+import argparse
+from slack import WebClient
 
-mess = ""
+parser = argparse.ArgumentParser(description='Zdalna konsola do pisania z na slacku wybranym botem')
+parser.add_argument('--config', type=str, help='Lokalizacja konfiguracji bota')
+parser.add_argument('--ch', type=str, help='Kanał na ,którym ma być wysłana wiadomość')
+parser.add_argument('--mess', type=str, help='Treść wiadomości')
+args = parser.parse_args()
+
+if args.config != None:
+    conf = args.config
+else:
+    parser.print_help()
+    sys.exit(1)
+
+try: 
+    exist = os.path.isfile(conf)
+except IndexError:
+    print('Podany plik konfiguracyjny nie istnieje!')
+    sys.exit(1)
+    
+if not exist:
+    print('Podany plik konfiguracyjny nie istnieje!')
+    sys.exit(1)
+
+if args.ch != None:
+    ch = args.ch
+else:
+    parser.print_help()
+    sys.exit(1)
+
+if args.mess != None:
+    mess = args.mess
+else:
+    parser.print_help()
+    sys.exit(1)
+
 config = configparser.ConfigParser()
-config.read(sys.argv[1])
-url = config['BOT']['url']
+config.read(conf)
+
+try:
+    token = config['BOT']['token']
+except KeyError:
+    print("Brak tokenu w konfiguracji")
+    sys.exit(1)
+
+client = WebClient(token=token)
+
+client.chat_postMessage(
+    channel=ch,
+    text=mess
+)
 
 
-
-for x in sys.argv:
-    if x != sys.argv[0] and x != sys.argv[1] and sys.argv[2]:
-        mess = f"{mess} {x}"
-url = f'{url}/api/messages'
-print (url)
-payload = {"text" : mess ,"ch" : sys.argv[2]}
-r = requests.post(url=url, data=payload)
-print(r.text)
 

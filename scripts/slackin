@@ -113,12 +113,18 @@ def drawSomethingCool(ctx, users):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-h','--help' help='Show help')
-    parser.add_argument('-c','--config'help='add config')
+    parser = argparse.ArgumentParser(description='Uruchamia bota slacka')
+    parser.add_argument('--config', type=str, help='Lokalizacja konfiguracji bota')
+    args = parser.parse_args()
 
+    if args.config != None:
+        conf = args.config
+    else:
+        parser.print_help()
+        sys.exit(1)
+    
     try: 
-        exist = os.path.isfile(sys.argv[2])
+        exist = os.path.isfile(conf)
     except IndexError:
         print('Podany plik konfiguracyjny nie istnieje!')
         sys.exit(1)
@@ -128,7 +134,7 @@ if __name__ == '__main__':
         sys.exit(1)
     
     config = configparser.ConfigParser()
-    config.read(sys.argv[2])
+    config.read(conf)
 
     try:
         port = config['BOT']['port']
@@ -299,13 +305,17 @@ if __name__ == '__main__':
 
 
 
-    @app.route("/api/messages", methods=['GET','POST'])
+    @app.route("/api/messages", methods=['POST'])
     def cmd_slack():        
         if request.method == 'POST':
             message_text = request.form["text"]
             channel = request.form["ch"]
+            pref = request.form["prefix"]
             print(channel)
             print (dm)
+
+            if nazwa_bota != pref:
+                return make_response("", 200)
 
             try:
                 channel_id = dm[channel]
