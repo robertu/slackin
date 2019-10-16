@@ -4,13 +4,27 @@
 
 ```
 [BOT]
-token = xoxb-()
-signing_secret = Klucz 16-stkowy
-url = https://nasza_domena
+
+# Token naszego bota
+token = xoxb-779874283382-781917834228-yOwDUWiwPuVU7lTt4cvCeRzn
+
+# signing secret naszego bota
+signing_secret = 512dccab767437d52268bef8f4c4160e
+
+# adress używany przez slacka
+url = https://bot2.1kb.pl
+
+# port na którym nałuchuje flask serwer
 port = 4002
+
+# adress ip na którym nałuchuje flask serwer
 host = 0.0.0.0
+
+# Debug mode dla Flaskapp
 debug_mode = false
-name = examplebot
+
+# name jest nazwa 1:1 z ta która dodana jest w slacku
+name = bot2
 ```
 
 ### Zakładasz nową aplikację
@@ -66,7 +80,13 @@ Jest to strona która pojawi się gdy zainstalujemy bota.
 Następnie w "Manage Distribution" zaznaczamy "I’ve reviewed and removed any hard-coded information" i publikujemy bota:
 ![09. publish bot](docs/09-publish-bot.png)
 
+![09.a signing secret](docs/Signing_secret.png)
 
+To po kliknięciu "show", pojawi się nasz signing secret
+
+![09.b bot token](dosc/Token.png)
+
+Nasz token to pojawia się po dodaniu bot usera, zaczyna się od "xoxb-" , można łatwo go skopiować klikając kopiuj
 
 
 Następnie w zakładce 'Event Subscriptions' włączamy eventy i podajemy następujący ades "https://Nasz_domena/slack/events
