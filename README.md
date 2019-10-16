@@ -84,7 +84,7 @@ Następnie w "Manage Distribution" zaznaczamy "I’ve reviewed and removed any h
 
 To po kliknięciu "show", pojawi się nasz signing secret
 
-![09.b bot token](dosc/Token.png)
+![09.b bot token](docs/Token.png)
 
 Nasz token to pojawia się po dodaniu bot usera, zaczyna się od "xoxb-" , można łatwo go skopiować klikając kopiuj
 
