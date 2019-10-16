@@ -1,5 +1,18 @@
 # Konfiguracja slack bota
 
+### Przykładowy plik konfiguracyjny
+
+```
+[BOT]
+token = xoxb-779874283382-781917834228-yOwDUWiwPuVU7lTt4cvCeRzn
+signing_secret = 512dccab767437d52268bef8f4c4160e
+url = https://nasza_domena
+port = 4002
+host = 0.0.0.0
+debug_mode = false
+name = examplebot
+```
+
 ### Zakładasz nową aplikację
 
 Klik na url: [slack new_app](https://api.slack.com/apps?new_app=1)
@@ -23,8 +36,9 @@ Następnie wchodzimy w zakładkę " Interactive Components " i przełanczamy z "
 
 ### Podpięcie bota do serwera http
 
-Następnie podajemy "Request URL" np. https://<Nasza domena>/slack/message_actions
+Następnie podajemy "Request URL" np. https://Nasza_domena/slack/message_actions
 I zapisujemy zmiany
+Aby to wykonać należy włączyć skrypt bota
 
 ![05. requst url](05-add-rp-url.png)
 
@@ -43,6 +57,7 @@ Natępnie instaluje go na swoim serwerze
 ### Redirect URL
 
 Potem w zakładce  "OAuth Tokens & Redirect URLs" dodajemy redirect URLs np. https://example.com/path
+Jest to strona która pojawi się gdy zainstalujemy bota.
 
 ![08. add url](08-url-addd.png)
 
@@ -52,32 +67,19 @@ Następnie w "Manage Distribution" zaznaczamy "I’ve reviewed and removed any h
 ![09. publish bot](09-publish-bot.png)
 
 
-Teraz zmieniamy:
-
-### Token
-
-![10. bot token](10-bot-token.png)
-To jest nasz token "Bot User OAuth Access Token"
-
-### Klucz
-
-A to jest nasz klucz "Signing Secret":
-![11. kluc](11-klucz.png)
 
 
-```
-slack_event_listen = SlackEventAdapter(signing_secret='Nasz klucz', endpoint="/slack/events", server=app)
-token = 'Nasz token'
-```
+Następnie w zakładce 'Event Subscriptions' włączamy eventy i podajemy następujący ades "https://Nasz_domena/slack/events
 
+![10. event](12-event-url.png)
 
-Teraz muszimy przypisać w kodzie te dwie wartości
+Aby to zadziałało trzeba mieć uruchiomony skrypt bota
+Po właczeniu eventów należy dodać:
+w "Subscribe to Bot Event" oraz "Subscribe to Workspace Events" nasßepujące eventy
 
-Następnie uruchamiamy kod bota "python event.py" albo "./event.py"
-
-Następnie w zakładce 'Event Subscriptions' włączamy eventy i podajemy następujący ades "https://<Nasz domena>/slack/events
-
-![12. event](12-event-url.png)
+-message.im
+-message.channels
+-group_history_changed
 
 Dodatkowo należy nadać mu uprawnienia admina oraz message.channels , poniżej załączam ofcjialną dokumnetacja aplikacji na slacku:
 [sack bot tut](https://github.com/slackapi/python-slackclient/tree/master/tutorial)
