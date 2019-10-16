@@ -77,9 +77,9 @@ Aby to zadziałało trzeba mieć uruchiomony skrypt bota
 Po właczeniu eventów należy dodać:
 w "Subscribe to Bot Event" oraz "Subscribe to Workspace Events" nasßepujące eventy
 
- message.im
- message.channels
- group_history_changed
+ * message.im
+ * message.channels
+ * group_history_changed
 
 Dodatkowo należy nadać mu uprawnienia admina oraz message.channels , poniżej załączam ofcjialną dokumnetacja aplikacji na slacku:
 [sack bot tut](https://github.com/slackapi/python-slackclient/tree/master/tutorial)
