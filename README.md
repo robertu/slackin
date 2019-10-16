@@ -6,13 +6,13 @@
 [BOT]
 
 # Token naszego bota
-token = xoxb-779874283382-781917834228-yOwDUWiwPuVU7lTt4cvCeRzn
+token = xoxb-(Reszta klucz)
 
 # signing secret naszego bota
-signing_secret = 512dccab767437d52268bef8f4c4160e
+signing_secret = 16-stkowy klucz
 
 # adress używany przez slacka
-url = https://bot2.1kb.pl
+url = https://Nasza_domena
 
 # port na którym nałuchuje flask serwer
 port = 4002
@@ -24,7 +24,7 @@ host = 0.0.0.0
 debug_mode = false
 
 # name jest nazwa 1:1 z ta która dodana jest w slacku
-name = bot2
+name = examplebot
 ```
 
 ### Zakładasz nową aplikację
