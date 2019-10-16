@@ -4,8 +4,8 @@
 
 ```
 [BOT]
-token = xoxb-779874283382-781917834228-yOwDUWiwPuVU7lTt4cvCeRzn
-signing_secret = 512dccab767437d52268bef8f4c4160e
+token = xoxb-()
+signing_secret = Klucz 16-stkowy
 url = https://nasza_domena
 port = 4002
 host = 0.0.0.0
@@ -75,7 +75,7 @@ Następnie w zakładce 'Event Subscriptions' włączamy eventy i podajemy nastę
 
 Aby to zadziałało trzeba mieć uruchiomony skrypt bota
 Po właczeniu eventów należy dodać:
-w "Subscribe to Bot Event" oraz "Subscribe to Workspace Events" nasßepujące eventy
+w "Subscribe to Bot Event" oraz "Subscribe to Workspace Events" nastepujące eventy
 
  * message.im
  * message.channels
