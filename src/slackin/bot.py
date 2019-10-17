@@ -19,7 +19,7 @@ class Bot(object):
         self.name = name
         self.app = Flask(name)
         self.client = WebClient(token=slack_token)
-        self.eventListener = SlackEventAdapter(signing_secret=signing_secret, endpoint="/events", server=self.app)
+        self.eventListener = SlackEventAdapter(signing_secret=signing_secret, endpoint="/slack/events", server=self.app)
 
         @self.app.route('/', methods=['GET'])
         def index():
@@ -28,27 +28,33 @@ class Bot(object):
         @self.eventListener.on("message")
         def message(event_data):
             try:
-                cmd = re.split(r'\W+',event_data["event"]["text"])
+                args = re.split(r'\W+',event_data["event"]["text"])
             except KeyError:
                 return
             channel = event_data["event"]["channel"]
             try:
-                nazwa = cmd[0]
-                komenda = cmd[1]
+                bot_name = args[0]
+                command = args[1]
                 try:
-                    args = cmd[2:]
+                    args = args[2:]
                 except IndexError:
                     args = []
             except IndexError:
-                return make_response("", 200)
-            if not (nazwa in [self.name, 'all']):
-                return make_response("", 200)
-            if komenda == 'hello':
-                mess = self.client.chat_postMessage(
-                    channel=event_data["event"]["channel"],
-                    text='Welcome!'
-                )
-            return make_response("", 200)
+                return
+            if not (bot_name in [self.name, 'all']):
+                return
+            try:
+                cmd = getattr(self, command)
+            except AttributeError:
+                pass
+            else:
+                resp = cmd(event_data=event_data, *args)
+                if resp is not None:
+                    mess = self.client.chat_postMessage(
+                        channel=event_data["event"]["channel"],
+                        text=resp
+                    )
+            return
 
     def run(self):
         self.app.run(host=self.host, port=self.port, debug=False)
@@ -66,6 +72,9 @@ def main():
     parser.add_argument('-t', '--token', type=str, help='Slack token value', required=True)
     args = parser.parse_args()
 
+    class MyBot(Bot):
+        def cmd_hello(self, event_data, *args, **kwargs):
+            return "Hello dude!"
 
-    bot = Bot(name="bot", port=args.port, host=args.ip, slack_token=args.token, signing_secret=args.secret)
+    bot = MyBot(name=args.name, port=args.port, host=args.ip, slack_token=args.token, signing_secret=args.secret)
     bot.run()
