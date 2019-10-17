@@ -21,6 +21,10 @@ class Bot(object):
         self.client = WebClient(token=slack_token)
         self.eventListener = SlackEventAdapter(signing_secret=signing_secret, endpoint="/events", server=self.app)
 
+        @self.app.route('/', methods=['GET'])
+        def index():
+            return make_response(f"Slack Integration Bot v{VERSION}", 200)
+
         @self.eventListener.on("message")
         def message(event_data):
             try:
