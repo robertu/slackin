@@ -1,14 +1,27 @@
 from setuptools import setup, find_packages
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+
+long_description = '''
+Slack bot integration based on flask appliacation.
+Requires external ip to operate and quite comprehensive configuration on slack side.
+It can operate on public channels as well as in private conversations.
+
+Supports:
+
+* commands
+* slack forms
+* text replies
+* atachements
+'''
 
 setup(
     name="Slack Integration Bot",
     version="0.1.1",
-    author="Mateusz Oleksa",
+    author="Mateusz Oleksa & Robert Urbanczyk",
     author_email="mail@linacti.software",
     keywords="slack flask bot",
+    license = 'LGPL',
+    platforms = ['Linux','Mac OSX'],
     description="An implementation of simple slack integration bot",
     packages=find_packages('src'),
     package_dir={'':'src'},
