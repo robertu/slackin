@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 long_description = '''
-Slack bot integration based on flask appliacation.
+Slack integration bot based on flask appliacation.
 Requires external ip to operate and quite comprehensive configuration on slack side.
 It can operate on public channels as well as in private conversations.
 
