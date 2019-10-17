@@ -6,17 +6,19 @@ import json
 from . import VERSION
 
 import re
+dm = {}
 
 class Bot(object):
     app = None
     client = None
-    def __init__(self, name=None, slack_token=None, signing_secret=None, host='127.0.0.1', port=8000):
+    def __init__(self, name=None, slack_token=None, signing_secret=None, host='127.0.0.1', port=8000, debug=False):
         assert name is not None, "Please give the bot a name"
         assert signing_secret is not None, "Muszę mieć signing secret by żyć"
         assert slack_token is not None, "Muszę mieć slack token secret by żyć"
         self.slack_token = slack_token
         self.host = host
         self.port = port
+        self.debug = debug
         self.name = name
         self.app = Flask(name)
         self.client = WebClient(token=slack_token)
@@ -32,18 +34,14 @@ class Bot(object):
         def message_actions():
 
             data = json.loads(request.form["payload"])
-            pp.pprint(vars(request))
             rt = data['type']
             if rt == "dialog_submission":
-                print(data['submission'])
-                mess = client.chat_postMessage(
+                mess = self.client.chat_postMessage(
                     channel=data["channel"]["id"],
                     text=f"Dziękujemy za formularz: {data['submission']}"
                 )
             elif rt == "interactive_message" and data['callback_id'] == "start":
                 dm[data['user']['name']] = data["channel"]["id"]
-                print("Work")
-
             elif rt == "interactive_message":
                 om = data['original_message']
                 at = om['attachments']
@@ -58,7 +56,7 @@ class Bot(object):
                 for e in cmd:
                     if e == 'form':
                         pass
-                    elif e == 'chbox':
+                    elif e == 'cbox':
                         elements.append(
                             {
                                 "label": "Prawda/Fałsz",
@@ -79,7 +77,7 @@ class Bot(object):
                                 ]
                             }
                         )
-                    elif e == 'dd':
+                    elif e == 'select':
                         elements.append(
                             {
                                 "label": "Imię zwierzątka",
@@ -100,7 +98,6 @@ class Bot(object):
                                 ]
                             }
                         )
-
                     elif e == 'text':
                         elements.append(
                             {
@@ -119,15 +116,6 @@ class Bot(object):
                             "placeholder": "Wpisz cokolwiek"
                             }
                         )
-                    # else:
-                    #     elements.append(
-                    #         {
-                    #         "label": "Input text",
-                    #         "name": f"el_{e}_{n}",
-                    #         "type": "text",
-                    #         "placeholder": "Wpisz cokolwiek"
-                    #         }
-                    #     )
                     n += 1
 
                 dialog = {
@@ -136,37 +124,12 @@ class Bot(object):
                         "callback_id": "formCallback",
                         "elements": elements
                 }
-                pp.pprint(dialog)
-                form1 = client.dialog_open(
+                form1 = self.client.dialog_open(
                     trigger_id = data["trigger_id"],
                     dialog = dialog
                 )
             else:
                 print(f"nieznany typ messaga {rt}")
-            # trigger_id= data["trigger_id"]
-            # except KeyError:
-            # try:
-            #     form1 = client.dialog_open(
-            #         trigger_id= data["trigger_id"] ,
-            #         dialog= {
-            #             "title": "Formularz 1",
-            #             "submit_label": "Wyślij",
-            #             "callback_id": "formCallback",
-            #             "elements": [
-            #                 {
-            #                 "label": "Input text",
-            #                 "name": "text",
-            #                 "type": "text",
-            #                 "placeholder": "Wpisz cokolwiek"
-            #                 }
-            #             ]
-            #         }
-            #     )
-            # except KeyError:
-            #     print("*" * 100)
-            #     print(data)
-            #     print("*" * 100)
-
             return make_response("", 200)
 
 
@@ -202,7 +165,7 @@ class Bot(object):
             return
 
     def run(self):
-        self.app.run(host=self.host, port=self.port, debug=False)
+        self.app.run(host=self.host, port=self.port, debug=self.debug)
 
 
 
