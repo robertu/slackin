@@ -184,5 +184,5 @@ def main():
         def cmd_hello(self, event_data, *args, **kwargs):
             return "Hello dude!"
 
-    bot = MyBot(name=args.name, port=args.port, host=args.ip, slack_token=args.token, signing_secret=args.secret)
+    bot = MyBot(name=args.name, port=args.port, host=args.ip, slack_token=args.token, signing_secret=args.secret, debug=True)
     bot.run()
