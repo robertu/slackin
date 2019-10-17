@@ -2,6 +2,8 @@
 from flask import Flask, request, make_response, Response
 from slackeventsapi import SlackEventAdapter
 from slack import WebClient
+from . import VERSION
+
 import re
 
 class Bot(object):
@@ -47,3 +49,19 @@ class Bot(object):
     def run(self):
         self.app.run(host=self.host, port=self.port, debug=False)
 
+
+
+def main():
+    import argparse, sys
+    parser = argparse.ArgumentParser(prog='slackin', description='Slack integration bot')
+    parser.add_argument('-v', '--version', action='version', version=f'%(prog)s {VERSION}')
+    parser.add_argument('-i', '--ip', type=str, help='Hostname or ip for bot app to listen on. Default: 127.0.0.1', default='127.0.0.1')
+    parser.add_argument('-n', '--name', type=str, help='Slack bot name. Default: "bot".', default='bot')
+    parser.add_argument('-p', '--port', type=int, help='Port number for bot app to listen on. Default: 8000.', default=8000)
+    parser.add_argument('-s', '--secret', type=str, help='Slack signing_secret value', required=True)
+    parser.add_argument('-t', '--token', type=str, help='Slack token value', required=True)
+    args = parser.parse_args()
+
+
+    bot = Bot(name="bot", port=args.port, host=args.ip, slack_token=args.token, signing_secret=args.secret)
+    bot.run()

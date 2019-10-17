@@ -10,7 +10,6 @@ setup(
     author_email="mail@linacti.software",
     keywords="slack flask bot",
     description="An implementation of simple slack integration bot",
-    scripts=['scripts/slackin', 'scripts/slackinctl'],
     packages=find_packages('src'),
     package_dir={'':'src'},
     long_description=long_description,
@@ -26,7 +25,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'slackin = slackin:main',
+            'slackin-bot = slackin.bot:main',
         ],
     },
 )
