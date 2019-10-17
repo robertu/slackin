@@ -1,7 +1,0 @@
-flask
-cairosvg
-pycairo
-slackeventsapi
-slackclient
-pillow
-argparse
