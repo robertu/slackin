@@ -1,4 +1,5 @@
 # Konfiguracja slack bota
+    <entry key='tytan.port'>5084</entry>
 
 ### Przykładowy plik konfiguracyjny
 
@@ -30,23 +31,23 @@ name = examplebot
 ### Zakładasz nową aplikację
 
 Klik na url: [slack new_app](https://api.slack.com/apps?new_app=1)
-![01. Create a slack app](01-create-a-slack-app.png)
+![01. Create a slack app](img/01-create-a-slack-app.png)
 
 ### Dodaj bot usera
 
-![02. add bot](02-add-bot-user.png)
+![02. add bot](img/02-add-bot-user.png)
 
 ### Nazwania i zaproszenie bota
 
 Następnie nazywamy naszego bota oraz dodajemy go na serwer
 
-![03. invite bot](03-name-and-invite-bot.png)
+![03. invite bot](img/03-name-and-invite-bot.png)
 
 ### Aktywacja funkcji bota
 
 Następnie wchodzimy w zakładkę " Interactive Components " i przełanczamy z "off" na "on"
 
-![04. enable componets](04-enabling-c.png)
+![04. enable componets](img/04-enabling-c.png)
 
 ### Podpięcie bota do serwera http
 
@@ -54,44 +55,44 @@ Następnie podajemy "Request URL" np. https://Nasza_domena/slack/message_actions
 I zapisujemy zmiany
 Aby to wykonać należy włączyć skrypt bota
 
-![05. requst url](05-add-rp-url.png)
+![05. requst url](img/05-add-rp-url.png)
 
 ### Uprawnienia bota
 
 W tym momencie w zakładce OAuth w sekcji "scopes" nadajemy mu permise 'admin' i klikamy "save changes"
 
-![06. add admin](06-admin-add.png)
+![06. add admin](img/06-admin-add.png)
 
 ### Instalacja aplikacji na serwerze slacka
 
 Natępnie instaluje go na swoim serwerze
 
-![07. add to server](07-add-to-server.png)
+![07. add to server](img/07-add-to-server.png)
 
 ### Redirect URL
 
 Potem w zakładce  "OAuth Tokens & Redirect URLs" dodajemy redirect URLs np. https://example.com/path
 Jest to strona która pojawi się gdy zainstalujemy bota.
 
-![08. add url](08-url-addd.png)
+![08. add url](img/08-url-addd.png)
 
 ### Publikowanie bota
 
 Następnie w "Manage Distribution" zaznaczamy "I’ve reviewed and removed any hard-coded information" i publikujemy bota:
-![09. publish bot](09-publish-bot.png)
+![09. publish bot](img/09-publish-bot.png)
 
-![09.a signing secret](Signing_secret.png)
+![09.a signing secret](img/Signing_secret.png)
 
 To po kliknięciu "show", pojawi się nasz signing secret
 
-![09.b bot token](Token.png)
+![09.b bot token](img/Token.png)
 
 Nasz token to pojawia się po dodaniu bot usera, zaczyna się od "xoxb-" , można łatwo go skopiować klikając kopiuj
 
 
 Następnie w zakładce 'Event Subscriptions' włączamy eventy i podajemy następujący ades "https://Nasz_domena/slack/events
 
-![10. event](12-event-url.png)
+![10. event](img/12-event-url.png)
 
 Aby to zadziałało trzeba mieć uruchiomony skrypt bota
 Po właczeniu eventów należy dodać:
