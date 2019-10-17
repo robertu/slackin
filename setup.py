@@ -16,7 +16,7 @@ Supports:
 
 setup(
     name="Slack Integration Bot",
-    version="0.1.1",
+    version="0.1.2",
     author="Mateusz Oleksa & Robert Urbanczyk",
     author_email="mail@linacti.software",
     keywords="slack flask bot",
