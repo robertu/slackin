@@ -2,6 +2,7 @@
 from flask import Flask, request, make_response, Response
 from slackeventsapi import SlackEventAdapter
 from slack import WebClient
+import json
 from . import VERSION
 
 import re
@@ -24,6 +25,150 @@ class Bot(object):
         @self.app.route('/', methods=['GET'])
         def index():
             return make_response(f"Slack Integration Bot v{VERSION}", 200)
+
+
+        #Nałuchiwanie na odpowiedz z wiadomości z przyciskiem
+        @self.app.route("/slack/message_actions", methods=["POST"])
+        def message_actions():
+
+            data = json.loads(request.form["payload"])
+            pp.pprint(vars(request))
+            rt = data['type']
+            if rt == "dialog_submission":
+                print(data['submission'])
+                mess = client.chat_postMessage(
+                    channel=data["channel"]["id"],
+                    text=f"Dziękujemy za formularz: {data['submission']}"
+                )
+            elif rt == "interactive_message" and data['callback_id'] == "start":
+                dm[data['user']['name']] = data["channel"]["id"]
+                print("Work")
+
+            elif rt == "interactive_message":
+                om = data['original_message']
+                at = om['attachments']
+                ci = at[0]['callback_id']
+                cmd = []
+                if ci.startswith("fromSelect:"):
+                    cmd = ci.replace("fromSelect:",'')
+                    cmd = eval(cmd)
+                print(at)
+                n = 1
+                elements = []
+                for e in cmd:
+                    if e == 'form':
+                        pass
+                    elif e == 'chbox':
+                        elements.append(
+                            {
+                                "label": "Prawda/Fałsz",
+                                "name": f"el_{e}_{n}",
+                                "type": "select",
+                                "value": "1",
+                                "placeholder": "",
+                                "options": [
+                                    {
+                                        "label": "Prawda",
+                                        "value": "1"
+                                    },
+                                    {
+                                        "label": "Fałsz",
+                                        "value": "2"
+                                    }
+
+                                ]
+                            }
+                        )
+                    elif e == 'dd':
+                        elements.append(
+                            {
+                                "label": "Imię zwierzątka",
+                                "name": f"el_{e}_{n}",
+                                "type": "select",
+                                "value": "2",
+                                "placeholder": "Wybierz imię",
+                                "options": [
+                                    {
+                                        "label": "Ala",
+                                        "value": "1"
+                                    },
+                                    {
+                                        "label": "Ola",
+                                        "value": "2"
+                                    }
+
+                                ]
+                            }
+                        )
+
+                    elif e == 'text':
+                        elements.append(
+                            {
+                            "label": "Input text",
+                            "name": f"el_{e}_{n}",
+                            "type": "text",
+                            "placeholder": "Wpisz cokolwiek"
+                            }
+                        )
+                    elif e == 'area':
+                        elements.append(
+                            {
+                            "label": "Input textarea",
+                            "name": f"el_{e}_{n}",
+                            "type": "textarea",
+                            "placeholder": "Wpisz cokolwiek"
+                            }
+                        )
+                    # else:
+                    #     elements.append(
+                    #         {
+                    #         "label": "Input text",
+                    #         "name": f"el_{e}_{n}",
+                    #         "type": "text",
+                    #         "placeholder": "Wpisz cokolwiek"
+                    #         }
+                    #     )
+                    n += 1
+
+                dialog = {
+                        "title": "Formularz",
+                        "submit_label": "Wyślij",
+                        "callback_id": "formCallback",
+                        "elements": elements
+                }
+                pp.pprint(dialog)
+                form1 = client.dialog_open(
+                    trigger_id = data["trigger_id"],
+                    dialog = dialog
+                )
+            else:
+                print(f"nieznany typ messaga {rt}")
+            # trigger_id= data["trigger_id"]
+            # except KeyError:
+            # try:
+            #     form1 = client.dialog_open(
+            #         trigger_id= data["trigger_id"] ,
+            #         dialog= {
+            #             "title": "Formularz 1",
+            #             "submit_label": "Wyślij",
+            #             "callback_id": "formCallback",
+            #             "elements": [
+            #                 {
+            #                 "label": "Input text",
+            #                 "name": "text",
+            #                 "type": "text",
+            #                 "placeholder": "Wpisz cokolwiek"
+            #                 }
+            #             ]
+            #         }
+            #     )
+            # except KeyError:
+            #     print("*" * 100)
+            #     print(data)
+            #     print("*" * 100)
+
+            return make_response("", 200)
+
 
         @self.eventListener.on("message")
         def message(event_data):
