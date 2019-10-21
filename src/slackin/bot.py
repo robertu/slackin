@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from flask import Flask, request, make_response, Response
 from slackeventsapi import SlackEventAdapter
-from slack import WebClient
+from slack import WebClient, RTMClient
 import json
 from . import VERSION
+from os import system
+import subprocess
 
 import re
 dm = {}
@@ -21,12 +23,15 @@ class Bot(object):
         self.debug = debug
         self.name = name
         self.app = Flask(name)
+        self.rtm = RTMClient(token=self.slack_token)
         self.client = WebClient(token=slack_token)
         self.eventListener = SlackEventAdapter(signing_secret=signing_secret, endpoint="/slack/events", server=self.app)
 
         @self.app.route('/', methods=['GET'])
         def index():
             return make_response(f"Slack Integration Bot v{VERSION}", 200)
+
+        
 
 
         #Nałuchiwanie na odpowiedz z wiadomości z przyciskiem
@@ -152,21 +157,26 @@ class Bot(object):
             if not (bot_name in [self.name, 'all']):
                 return
             try:
-                cmd = getattr(self, command)
+                cmd = getattr(self, f"cmd_{command}")
             except AttributeError:
                 pass
             else:
-                resp = cmd(event_data=event_data, *args)
-                if resp is not None:
+                resp = cmd(event_data=event_data, args=args)
+                if type(resp) == str and resp:
                     mess = self.client.chat_postMessage(
                         channel=event_data["event"]["channel"],
                         text=resp
+                    )
+                else:
+                    mess = self.client.chat_postMessage(
+                        channel=event_data["event"]["channel"],
+                        text=f"Błędna odpowiedź z komendy {command}"
                     )
             return
 
     def run(self):
         self.app.run(host=self.host, port=self.port, debug=self.debug)
-
+        
 
 
 def main():
@@ -181,8 +191,17 @@ def main():
     args = parser.parse_args()
 
     class MyBot(Bot):
-        def cmd_hello(self, event_data, *args, **kwargs):
+        def cmd_hello(self, event_data=None, args=[]):
             return "Hello dude!"
+        def cmd_xd(self, event_data=None, args=[]):
+            return "Hello xd!"
+        def cmd_pat(self, event_data=None, args=[]):
+            return "Nie pij tyle!"
+        def cmd_update(self, event_data=None, args=[]):
+            print('ls ' + ' '.join(args))
+            myShellCmd = subprocess.Popen(['./update.sh ', ' '.join(args)], shell=True, stdout=subprocess.PIPE , stderr=subprocess.STDOUT)
+            stdout,stderr = myShellCmd.communicate()
+            return str(f"{stdout} {stderr}")
 
     bot = MyBot(name=args.name, port=args.port, host=args.ip, slack_token=args.token, signing_secret=args.secret, debug=True)
     bot.run()
