@@ -4,8 +4,8 @@ from slackeventsapi import SlackEventAdapter
 from slack import WebClient, RTMClient
 import json
 from . import VERSION
-from os import system
-import subprocess
+from os import system, popen
+import subprocess, time
 
 import re
 dm = {}
@@ -174,8 +174,10 @@ class Bot(object):
                     )
             return
 
+
     def run(self):
         self.app.run(host=self.host, port=self.port, debug=self.debug)
+
         
 
 
@@ -199,9 +201,15 @@ def main():
             return "Nie pij tyle!"
         def cmd_update(self, event_data=None, args=[]):
             print('ls ' + ' '.join(args))
-            myShellCmd = subprocess.Popen(['./update.sh ', ' '.join(args)], shell=True, stdout=subprocess.PIPE , stderr=subprocess.STDOUT)
-            stdout,stderr = myShellCmd.communicate()
-            return str(f"{stdout} {stderr}")
+            odp = None
+            myShellCmd = subprocess.run(['ls ', ' '.join(args)], shell=True, stdout=subprocess.PIPE , stderr=subprocess.STDOUT)
+            if myShellCmd.returncode == 0:
+                opd = myShellCmd.stdout
+            elif myShellCmd.returncode != 1:
+                opd = f'Błąd: {myShellCmd.stdout}'
+            else:
+                opd = "Nieznany błąd komendy"
+            return str(opd)
 
     bot = MyBot(name=args.name, port=args.port, host=args.ip, slack_token=args.token, signing_secret=args.secret, debug=True)
     bot.run()
