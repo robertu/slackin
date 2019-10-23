@@ -30,7 +30,6 @@ setup(
     install_requires=[
         'flask',
         'cairosvg',
-        'pycairo',
         'slackeventsapi',
         'slackclient',
         'pillow',
@@ -39,6 +38,7 @@ setup(
     entry_points={
         'console_scripts': [
             'slackin-bot = slackin.bot:main',
+            'slackin-rtm-bot = slackin.botRtm:main',
         ],
     },
 )
