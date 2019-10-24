@@ -39,6 +39,7 @@ setup(
     entry_points={
         'console_scripts': [
             'slackin-bot = slackin.bot:main',
+            'slackin-rtm-bot = slackin.botRtm:main',
         ],
     },
 )
