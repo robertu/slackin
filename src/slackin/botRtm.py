@@ -63,7 +63,7 @@ class Bot(object):
 
     def run(self):
         try:
-            rtm_client = RTMClient(token=self.slack_token)
+            rtm_client = RTMClient(token=self.slack_token, connect_method='rtm.start')
             rtm_client.start()
         except TypeError as e:
             print("Muszisz poczekać chwile, i potem odpalic bota \n Bota mozna odpalac raz na minute!" + e)
