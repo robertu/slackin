@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from slack import WebClient, RTMClient
+# from slack import WebClient, RTMClient
+from slack import RTMClient
 import json
 from . import VERSION
 from os import system, popen
@@ -10,13 +11,10 @@ import re
 dm = {}
 
 class Bot(object):
-    rtm = None
-    client = None
     def __init__(self, name=None, slack_token=None):
         assert slack_token is not None, "Muszę mieć slack token secret by żyć"
         self.slack_token = slack_token
         self.name = name
-        self.rtm = RTMClient(token=self.slack_token)
         # self.client = WebClient(token=slack_token)
 
 
@@ -65,7 +63,8 @@ class Bot(object):
 
     def run(self):
         try:
-            self.rtm.start()
+            rtm_client = RTMClient(token=self.slack_token)
+            rtm_client.start()
         except TypeError as e:
             print("Muszisz poczekać chwile, i potem odpalic bota \n Bota mozna odpalac raz na minute!" + e)
 
