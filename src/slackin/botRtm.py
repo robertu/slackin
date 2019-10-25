@@ -17,12 +17,14 @@ class Bot(object):
         self.slack_token = slack_token
         self.name = name
         self.rtm = RTMClient(token=self.slack_token)
-        self.client = WebClient(token=slack_token)
+        # self.client = WebClient(token=slack_token)
 
 
         @RTMClient.run_on(event="message")
         def message(**payload):
             data = payload['data']
+            web_client = payload['web_client']
+            rtm_client = payload['rtm_client']
             try:
                 args = re.split(r'\W+',data["text"])
             except KeyError:
@@ -42,19 +44,19 @@ class Bot(object):
             try:
                 cmd = getattr(self, f"cmd_{command}")
             except AttributeError:
-                mess = self.client.chat_postMessage(
-                        channel=data["channel"],
-                        text=f"Nie znam takiej komendy \n wpisz ```{self.name} help``` aby uzyskać pomoc"
-                    )
+                mess = web_client.chat_postMessage(
+                    channel=data["channel"],
+                    text=f"Nie znam takiej komendy \n wpisz ```{self.name} help``` aby uzyskać pomoc"
+                )
             else:
                 resp = cmd(data=data, args=args)
                 if type(resp) == str and resp:
-                    mess = self.client.chat_postMessage(
+                    mess = web_client.chat_postMessage(
                         channel=data["channel"],
                         text=resp
                     )
                 else:
-                    mess = self.client.chat_postMessage(
+                    mess = web_client.chat_postMessage(
                         channel=data["channel"],
                         text=f"Błędna odpowiedź z komendy {command}"
                     )
