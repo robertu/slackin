@@ -11,66 +11,60 @@ import certifi
 import re
 dm = {}
 
-class Bot(object):
-    def __init__(self, name=None, slack_token=None):
-        assert slack_token is not None, "Muszę mieć slack token secret by żyć"
-        self.slack_token = slack_token
-        self.name = name
-        # self.client = WebClient(token=slack_token)
+bot = None
 
-
-        @slack.RTMClient.run_on(event="message")
-        def message(**payload):
-            data = payload['data']
-            web_client = payload['web_client']
-            rtm_client = payload['rtm_client']
-            try:
-                args = re.split(r'\W+',data["text"])
-            except KeyError:
-                return
-            channel = data["channel"]
-            try:
-                bot_name = args[0]
-                command = args[1]
-                try:
-                    args = args[2:]
-                except IndexError:
-                    args = []
-            except IndexError:
-                return
-            if not (bot_name in [self.name, 'all']):
-                return
-            try:
-                cmd = getattr(self, f"cmd_{command}")
-            except AttributeError:
-                mess = web_client.chat_postMessage(
-                    channel=data["channel"],
-                    text=f"Nie znam takiej komendy \n wpisz ```{self.name} help``` aby uzyskać pomoc"
-                )
-            else:
-                resp = cmd(data=data, args=args)
-                if type(resp) == str and resp:
-                    mess = web_client.chat_postMessage(
-                        channel=data["channel"],
-                        text=resp
-                    )
-                else:
-                    mess = web_client.chat_postMessage(
-                        channel=data["channel"],
-                        text=f"Błędna odpowiedź z komendy {command}"
-                    )
-            return
-
-
-    def run(self):
+@slack.RTMClient.run_on(event="message")
+def message(**payload):
+    data = payload['data']
+    web_client = payload['web_client']
+    rtm_client = payload['rtm_client']
+    try:
+        args = re.split(r'\W+',data["text"])
+    except KeyError:
+        return
+    channel = data["channel"]
+    try:
+        bot_name = args[0]
+        command = args[1]
         try:
-            ssl_context = ssl_lib.create_default_context(cafile=certifi.where())
-            rtm_client = slack.RTMClient(token=self.slack_token, ssl=ssl_context)
-            rtm_client.start()
-        except TypeError as e:
-            print("Muszisz poczekać chwile, i potem odpalic bota \n Bota mozna odpalac raz na minute!" + e)
+            args = args[2:]
+        except IndexError:
+            args = []
+    except IndexError:
+        return
+    if not (bot_name in [bot.name, 'all']):
+        return
+    try:
+        cmd = getattr(bot, f"cmd_{command}")
+    except AttributeError:
+        mess = web_client.chat_postMessage(
+            channel=data["channel"],
+            text=f"Nie znam takiej komendy \n wpisz ```{bot.name} help``` aby uzyskać pomoc"
+        )
+    else:
+        resp = cmd(data=data, args=args)
+        if type(resp) == str and resp:
+            mess = web_client.chat_postMessage(
+                channel=data["channel"],
+                text=resp
+            )
+        else:
+            mess = web_client.chat_postMessage(
+                channel=data["channel"],
+                text=f"Błędna odpowiedź z komendy {command}"
+            )
+    return
 
-        
+
+def run():
+    try:
+        ssl_context = ssl_lib.create_default_context(cafile=certifi.where())
+        rtm_client = slack.RTMClient(token=bot.slack_token, ssl=ssl_context)
+        rtm_client.start()
+    except TypeError as e:
+        print("Muszisz poczekać chwile, i potem odpalic bota \n Bota mozna odpalac raz na minute!" + e)
+
+    
 
 
 def main():
@@ -80,7 +74,11 @@ def main():
     parser.add_argument('-t', '--token', type=str, help='Slack token value', required=True)
     args = parser.parse_args()
 
-    class MyBot(Bot):
+    class Bot(object):
+        def __init__(self, name="bot", slack_token="x"):
+            self.name = name
+            self.slack_token = slack_token
+
         def cmd_hello(self, data=None, args=[]):
             return "Hello dude!"
         def cmd_update(self, data=None, args=[]):
@@ -95,5 +93,5 @@ def main():
             odp = f'```{self.name} hello - Bot sie z toba przywita ```\n ```{self.name} update - Wykonuje komnde```'
             return odp
 
-    bot = MyBot(name=args.name,slack_token=args.token)
-    bot.run()
+    bot = Bot(name=args.name,slack_token=args.token)
+    run()
