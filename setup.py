@@ -16,7 +16,7 @@ Supports:
 
 setup(
     name="Slack Integration Bot",
-    version="0.1.4",
+    version="0.1.5",
     author="Mateusz Oleksa & Robert Urbanczyk",
     author_email="mail@linacti.software",
     keywords="slack flask bot",
@@ -29,11 +29,10 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'flask',
-        'cairosvg',
         'slackeventsapi',
         'slackclient',
-        'pillow',
         'argparse',
+        'certifi',
     ],
     entry_points={
         'console_scripts': [

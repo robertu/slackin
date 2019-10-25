@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # from slack import WebClient, RTMClient
-from slack import RTMClient
+import slack
 import json
 from . import VERSION
 from os import system, popen
 import subprocess, time
 from subprocess import Popen, PIPE
-
+import ssl as ssl_lib
+import certifi
 import re
 dm = {}
 
@@ -18,7 +19,7 @@ class Bot(object):
         # self.client = WebClient(token=slack_token)
 
 
-        @RTMClient.run_on(event="message")
+        @slack.RTMClient.run_on(event="message")
         def message(**payload):
             data = payload['data']
             web_client = payload['web_client']
@@ -63,7 +64,8 @@ class Bot(object):
 
     def run(self):
         try:
-            rtm_client = RTMClient(token=self.slack_token, connect_method='rtm.start')
+            ssl_context = ssl_lib.create_default_context(cafile=certifi.where())
+            rtm_client = slack.RTMClient(token=self.slack_token, ssl=ssl_context)
             rtm_client.start()
         except TypeError as e:
             print("Muszisz poczekać chwile, i potem odpalic bota \n Bota mozna odpalac raz na minute!" + e)
