@@ -15,7 +15,7 @@ bot = None
 
 @slack.RTMClient.run_on(event="message")
 def message(**payload):
-    @global bot
+    global bot
     data = payload['data']
     web_client = payload['web_client']
     rtm_client = payload['rtm_client']
