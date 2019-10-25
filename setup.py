@@ -30,7 +30,6 @@ setup(
     install_requires=[
         'flask',
         'cairosvg',
-        'pycairo',
         'slackeventsapi',
         'slackclient',
         'pillow',
