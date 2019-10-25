@@ -15,6 +15,7 @@ bot = None
 
 @slack.RTMClient.run_on(event="message")
 def message(**payload):
+    @global bot
     data = payload['data']
     web_client = payload['web_client']
     rtm_client = payload['rtm_client']
@@ -56,7 +57,7 @@ def message(**payload):
     return
 
 
-def run():
+def run(bot):
     try:
         ssl_context = ssl_lib.create_default_context(cafile=certifi.where())
         rtm_client = slack.RTMClient(token=bot.slack_token, ssl=ssl_context)
@@ -94,4 +95,4 @@ def main():
             return odp
 
     bot = Bot(name=args.name,slack_token=args.token)
-    run()
+    run(bot)
